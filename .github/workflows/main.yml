@@ -7,4 +7,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: autoupdate
-        uses: ./dist
+        uses: ./
