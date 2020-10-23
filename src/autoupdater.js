@@ -19,7 +19,7 @@ async function handlePushEvent({ repo, base, octokit }) {
 
       const checkParams = {
         ...repo,
-        sha: pullRequest.head.ref,
+        sha: pullRequest.head.sha,
         context: `autoupdate from ${pullRequest.base.ref}`,
       };
 

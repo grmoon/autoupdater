@@ -14,8 +14,8 @@ async function expectError(callback, expected) {
 
 function createOctokitMock({ prs = [] }) {
   return {
-    checks: {
-      create: jest.fn(),
+    repos: {
+      createCommitStatus: jest.fn(),
     },
     pulls: {
       updateBranch: jest.fn(),
