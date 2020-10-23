@@ -15,7 +15,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os = __importStar(__webpack_require__(87));
+const os = __importStar(__webpack_require__(365));
 const utils_1 = __webpack_require__(278);
 /**
  * Commands
@@ -113,7 +113,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const command_1 = __webpack_require__(241);
 const file_command_1 = __webpack_require__(717);
 const utils_1 = __webpack_require__(278);
-const os = __importStar(__webpack_require__(87));
+const os = __importStar(__webpack_require__(365));
 const path = __importStar(__webpack_require__(622));
 /**
  * The code to exit an action
@@ -350,7 +350,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
+const os = __importStar(__webpack_require__(365));
 const utils_1 = __webpack_require__(278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -395,7 +395,7 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 53:
+/***/ 87:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -403,7 +403,7 @@ exports.toCommandValue = toCommandValue;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Context = void 0;
 const fs_1 = __webpack_require__(747);
-const os_1 = __webpack_require__(87);
+const os_1 = __webpack_require__(365);
 class Context {
     /**
      * Hydrate the context from the environment
@@ -478,7 +478,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getOctokit = exports.context = void 0;
-const Context = __importStar(__webpack_require__(53));
+const Context = __importStar(__webpack_require__(87));
 const utils_1 = __webpack_require__(30);
 exports.context = new Context.Context();
 /**
@@ -571,7 +571,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
-const Context = __importStar(__webpack_require__(53));
+const Context = __importStar(__webpack_require__(87));
 const Utils = __importStar(__webpack_require__(914));
 // octokit + plugins
 const core_1 = __webpack_require__(762);
@@ -5788,17 +5788,48 @@ function wrappy (fn, cb) {
 /***/ 280:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const core = __webpack_require__(186);
 const github = __webpack_require__(438);
 
-module.exports = function autoupdater({ GITHUB_TOKEN } = {}) {
+module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
   if (!GITHUB_TOKEN) {
-    throw new Error("GITHUB_TOKEN must be set.");
+    throw new Error("GITHUB_TOKEN must be set");
   }
 
+  const { repo, ref: base } = github.context;
   const octokit = github.getOctokit(GITHUB_TOKEN);
-  console.log(octokit);
+  const response = await octokit.pulls.list({ ...repo, base, state: "open" });
+  const pullRequests = response.data;
+
+  const promises = pullRequests
+    .map((pullRequest) => {
+      const shouldUpdate = pullRequest.labels.find(
+        (label) => label.name === "autoupdate"
+      );
+
+      if (!shouldUpdate) {
+        // continue
+        return false;
+      }
+
+      octokit.pulls.updateBranch({
+        ...repo,
+        pull_number: pullRequest.number,
+      });
+    })
+    .filter((promise) => promise);
+
+  const output = await Promise.all(promises);
+
+  console.log(output);
 };
+
+
+/***/ }),
+
+/***/ 396:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__(438);
 
 
 /***/ }),
@@ -5806,16 +5837,19 @@ module.exports = function autoupdater({ GITHUB_TOKEN } = {}) {
 /***/ 351:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-const core = __webpack_require__(186);
 const autoupdater = __webpack_require__(280);
+const core = __webpack_require__(186);
+const github = __webpack_require__(396);
 
-try {
-  autoupdater({
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-  });
-} catch (error) {
-  core.setFailed(error.message);
-}
+(async () => {
+  try {
+    await autoupdater(github, {
+      GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    });
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+})();
 
 
 /***/ }),
@@ -5876,7 +5910,7 @@ module.exports = require("net");
 
 /***/ }),
 
-/***/ 87:
+/***/ 365:
 /***/ ((module) => {
 
 "use strict";
