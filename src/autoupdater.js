@@ -6,7 +6,6 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
   }
 
   const { repo, ref: base } = github.context;
-  console.log("REF: ", base);
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const response = await octokit.pulls.list({ ...repo, base, state: "open" });
   const pullRequests = response.data;
@@ -23,5 +22,7 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
     });
   });
 
-  await Promise.all(promises);
+  const output = await Promise.all(promises);
+
+  console.log(output);
 };
