@@ -5802,7 +5802,7 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
   const pullRequests = response.data;
 
   const promises = pullRequests.map(async (pullRequest) => {
-    if (!label.includes("autoupdate")) {
+    if (!pullRequest.labels.includes("autoupdate")) {
       // continue
       return false;
     }
