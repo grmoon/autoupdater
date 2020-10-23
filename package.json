@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
-    "build": "ncc build src/index.js"
+    "build": "ncc build src/index.js -m"
   },
   "keywords": [],
   "author": "",
