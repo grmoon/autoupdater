@@ -1,20 +1,54 @@
 async function handlePushEvent({ repo, base, octokit }) {
+  console.log(1);
   const response = await octokit.pulls.list({ ...repo, base, state: "open" });
+  console.log(2);
   const pullRequests = response.data;
+  console.log(3);
 
   const promises = pullRequests
-    .map((pullRequest) => {
+    .map(async (pullRequest) => {
+      console.log(4);
       const shouldUpdate = pullRequest.labels.find(
         (label) => label.name === "autoupdate"
       );
 
+      console.log(5);
       if (!shouldUpdate) {
         return false;
       }
 
-      return octokit.pulls.updateBranch({
+      const checkParams = {
         ...repo,
-        pull_number: pullRequest.number,
+        sha: pullRequest.head.sha,
+        context: `autoupdate from ${pullRequest.base.ref}`,
+      };
+
+      console.log(6);
+      await octokit.repos.createCommitStatus({
+        ...checkParams,
+        state: "pending",
+        description: "Updating",
+      });
+      console.log(7);
+
+      let error;
+
+      try {
+        console.log(8);
+        await octokit.pulls.updateBranch({
+          ...repo,
+          pull_number: pullRequest.number,
+        });
+      } catch (e) {
+        console.log(9);
+        error = e;
+      }
+
+      console.log(10);
+      await octokit.repos.createCommitStatus({
+        ...checkParams,
+        state: error ? "error" : "success",
+        description: error ? error.message : "Successfully updated",
       });
     })
     .filter((promise) => promise);
