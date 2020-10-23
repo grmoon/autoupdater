@@ -1,5 +1,17 @@
 const autoupdater = require("../src/autoupdater");
 
+async function expectError(callback, expected) {
+  let error;
+
+  try {
+    await callback();
+  } catch (e) {
+    error = e;
+  }
+
+  expect(error).toEqual(expected);
+}
+
 function createOctokitMock({ prs = [] }) {
   return {
     pulls: {
@@ -11,18 +23,20 @@ function createOctokitMock({ prs = [] }) {
   };
 }
 
-function createGithubMock({ octokit, context } = {}) {
-  const contextMock = context || {
+function createGithubMock({ octokit = {}, context = {} } = {}) {
+  const contextMock = {
     repo: jest.mock(),
+    ...context,
   };
 
-  const octokitMock = octokit || {
+  const octokitMock = {
     pulls: {
       updateBranch: jest.fn(),
       list: jest
         .fn()
         .mockReturnValue(new Promise((resolve) => resolve({ data: [] }))),
     },
+    ...octokit,
   };
 
   return {
@@ -32,22 +46,18 @@ function createGithubMock({ octokit, context } = {}) {
 }
 
 describe("autoupdater", () => {
-  it("should throw an error if the GITHUB_TOKEN is falsey", async () => {
+  it("should throw an error if the GITHUB_TOKEN is falsey", () => {
     const githubMock = createGithubMock();
-    let error;
 
-    try {
-      await autoupdater(githubMock);
-    } catch (e) {
-      error = e;
-    }
-
-    expect(error).toEqual(new Error("GITHUB_TOKEN must be set"));
+    return expectError(
+      () => autoupdater(githubMock),
+      new Error("GITHUB_TOKEN must be set")
+    );
   });
 
   it("should make the octokit call to update the correct prs", async () => {
     const repo = { repo: "repo", owner: "owner" };
-    const context = { repo, ref: "ref" };
+    const context = { repo, ref: "ref", eventName: "push" };
     const prs = [
       {
         labels: [{ name: "autoupdate" }],
@@ -88,5 +98,15 @@ describe("autoupdater", () => {
       ...repo,
       pull_number: 2,
     });
+  });
+
+  it("should throw an error if it doesn't recognize an event", async () => {
+    const context = { eventName: "abc" };
+    const githubMock = createGithubMock({ context });
+
+    return expectError(
+      () => autoupdater(githubMock, { GITHUB_TOKEN: "GITHUB_TOKEN" }),
+      new Error("Unhandled event: abc")
+    );
   });
 });
