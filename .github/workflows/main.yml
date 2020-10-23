@@ -1,12 +1,12 @@
+name: autoupdater
 on: push
 jobs:
   autoupdater:
     runs-on: ubuntu-latest
     name: autoupdater
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: autoupdate
+      - uses: actions/checkout@v2
+      - name: Update Pull Requests
         uses: ./
         env:
           GITHUB_TOKEN: "${{ secrets.AUTOUPDATER_TOKEN }}"
