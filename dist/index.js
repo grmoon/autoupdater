@@ -5795,10 +5795,10 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
     throw new Error("GITHUB_TOKEN must be set");
   }
 
-  const { repo, ref } = github.context;
-  console.log("REF: ", ref);
+  const { repo, ref: base } = github.context;
+  console.log("REF: ", base);
   const octokit = github.getOctokit(GITHUB_TOKEN);
-  const response = await octokit.pulls.list({ ...repo, state: "open" });
+  const response = await octokit.pulls.list({ ...repo, base, state: "open" });
   const pullRequests = response.data;
 
   const promises = pullRequests.map(async (pullRequest) => {
