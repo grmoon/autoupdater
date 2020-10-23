@@ -5806,6 +5806,7 @@ module.exports = function autoupdater({ GITHUB_TOKEN } = {}) {
 /***/ 351:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
+const core = __webpack_require__(186);
 const autoupdater = __webpack_require__(280);
 
 try {
