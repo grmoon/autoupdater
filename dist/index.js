@@ -15,7 +15,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os = __importStar(__webpack_require__(365));
+const os = __importStar(__webpack_require__(87));
 const utils_1 = __webpack_require__(278);
 /**
  * Commands
@@ -113,7 +113,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const command_1 = __webpack_require__(241);
 const file_command_1 = __webpack_require__(717);
 const utils_1 = __webpack_require__(278);
-const os = __importStar(__webpack_require__(365));
+const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 /**
  * The code to exit an action
@@ -350,7 +350,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(365));
+const os = __importStar(__webpack_require__(87));
 const utils_1 = __webpack_require__(278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -395,7 +395,7 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 87:
+/***/ 53:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -403,7 +403,7 @@ exports.toCommandValue = toCommandValue;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Context = void 0;
 const fs_1 = __webpack_require__(747);
-const os_1 = __webpack_require__(365);
+const os_1 = __webpack_require__(87);
 class Context {
     /**
      * Hydrate the context from the environment
@@ -478,7 +478,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getOctokit = exports.context = void 0;
-const Context = __importStar(__webpack_require__(87));
+const Context = __importStar(__webpack_require__(53));
 const utils_1 = __webpack_require__(30);
 exports.context = new Context.Context();
 /**
@@ -571,7 +571,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
-const Context = __importStar(__webpack_require__(87));
+const Context = __importStar(__webpack_require__(53));
 const Utils = __importStar(__webpack_require__(914));
 // octokit + plugins
 const core_1 = __webpack_require__(762);
@@ -5786,11 +5786,9 @@ function wrappy (fn, cb) {
 /***/ }),
 
 /***/ 280:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module) => {
 
-const github = __webpack_require__(438);
-
-module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
+module.exports = async function autoupdater(github, { GITHUB_TOKEN } = {}) {
   if (!GITHUB_TOKEN) {
     throw new Error("GITHUB_TOKEN must be set");
   }
@@ -5807,29 +5805,18 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
       );
 
       if (!shouldUpdate) {
-        // continue
         return false;
       }
 
-      octokit.pulls.updateBranch({
+      return octokit.pulls.updateBranch({
         ...repo,
         pull_number: pullRequest.number,
       });
     })
     .filter((promise) => promise);
 
-  const output = await Promise.all(promises);
-
-  console.log(output);
+  await Promise.all(promises);
 };
-
-
-/***/ }),
-
-/***/ 396:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-module.exports = __webpack_require__(438);
 
 
 /***/ }),
@@ -5839,7 +5826,7 @@ module.exports = __webpack_require__(438);
 
 const autoupdater = __webpack_require__(280);
 const core = __webpack_require__(186);
-const github = __webpack_require__(396);
+const github = __webpack_require__(438);
 
 (async () => {
   try {
@@ -5910,7 +5897,7 @@ module.exports = require("net");
 
 /***/ }),
 
-/***/ 365:
+/***/ 87:
 /***/ ((module) => {
 
 "use strict";
