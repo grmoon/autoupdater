@@ -1,5 +1,5 @@
-name: autoupdater
-description: Update a PR branch
+name: "PR Auto Updater"
+description: "Keep a PR head branch up-to-date"
 runs:
   using: "node12"
   main: "dist/index.js"
