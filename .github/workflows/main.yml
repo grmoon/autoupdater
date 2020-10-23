@@ -1,0 +1,10 @@
+on: push
+jobs:
+  autoupdater:
+    runs-on: ubuntu-latest
+    name: updater
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: autoupdate
+        uses: ./dist
