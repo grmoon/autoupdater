@@ -1,3 +1,3 @@
 # autoupdater
 
-update 2
+update 3
