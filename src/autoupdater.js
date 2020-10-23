@@ -1,10 +1,4 @@
-module.exports = async function autoupdater(github, { GITHUB_TOKEN } = {}) {
-  if (!GITHUB_TOKEN) {
-    throw new Error("GITHUB_TOKEN must be set");
-  }
-
-  const { repo, ref: base } = github.context;
-  const octokit = github.getOctokit(GITHUB_TOKEN);
+async function handlePushEvent({ repo, base, octokit }) {
   const response = await octokit.pulls.list({ ...repo, base, state: "open" });
   const pullRequests = response.data;
 
@@ -26,4 +20,21 @@ module.exports = async function autoupdater(github, { GITHUB_TOKEN } = {}) {
     .filter((promise) => promise);
 
   await Promise.all(promises);
+}
+
+module.exports = async function autoupdater(github, { GITHUB_TOKEN } = {}) {
+  if (!GITHUB_TOKEN) {
+    throw new Error("GITHUB_TOKEN must be set");
+  }
+
+  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const { repo, ref: base, eventName } = github.context;
+
+  switch (eventName) {
+    case "push":
+      await handlePushEvent({ repo, base, octokit });
+      break;
+    default:
+      throw new Error(`Unhandled event: ${eventName}`);
+  }
 };
