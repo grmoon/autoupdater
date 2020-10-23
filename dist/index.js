@@ -5795,6 +5795,7 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
     throw new Error("GITHUB_TOKEN must be set");
   }
 
+  console.log(GITHUB_TOKEN);
   console.log(1);
   const repo = github.context.repo;
   console.log(2);
