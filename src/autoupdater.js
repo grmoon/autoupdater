@@ -13,7 +13,7 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
   console.log(3);
   console.log(repo.repo);
   console.log(repo);
-  const pullRequests = await octokit.pulls.list();
+  const pullRequests = await octokit.pulls.list({ repo: repo.repo });
   console.log(4);
 
   pullRequests.data.forEach((pullRequest) => {

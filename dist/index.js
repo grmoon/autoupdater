@@ -5803,7 +5803,7 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
   console.log(3);
   console.log(repo.repo);
   console.log(repo);
-  const pullRequests = await octokit.pulls.list();
+  const pullRequests = await octokit.pulls.list({ repo: repo.repo });
   console.log(4);
 
   pullRequests.data.forEach((pullRequest) => {
@@ -5841,6 +5841,7 @@ const github = __webpack_require__(396);
       GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     });
   } catch (error) {
+    console.log(error);
     core.setFailed(error.message);
   }
 })();
