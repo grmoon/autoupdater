@@ -1,6 +1,4 @@
-const github = require("@actions/github");
-
-module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
+module.exports = async function autoupdater(github, { GITHUB_TOKEN } = {}) {
   if (!GITHUB_TOKEN) {
     throw new Error("GITHUB_TOKEN must be set");
   }
@@ -17,18 +15,15 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
       );
 
       if (!shouldUpdate) {
-        // continue
         return false;
       }
 
-      octokit.pulls.updateBranch({
+      return octokit.pulls.updateBranch({
         ...repo,
         pull_number: pullRequest.number,
       });
     })
     .filter((promise) => promise);
 
-  const output = await Promise.all(promises);
-
-  console.log(output);
+  await Promise.all(promises);
 };
