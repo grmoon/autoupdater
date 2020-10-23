@@ -3,7 +3,7 @@ async function handlePushEvent({ repo, base, octokit }) {
   const pullRequests = response.data;
 
   const promises = pullRequests
-    .map((pullRequest) => {
+    .map(async (pullRequest) => {
       const shouldUpdate = pullRequest.labels.find(
         (label) => label.name === "autoupdate"
       );
@@ -12,9 +12,42 @@ async function handlePushEvent({ repo, base, octokit }) {
         return false;
       }
 
-      return octokit.pulls.updateBranch({
+      const checkParams = {
         ...repo,
-        pull_number: pullRequest.number,
+        head_sha: pullRequest.head.ref,
+        name: `autoupdate from ${pullRequest.base.ref}`,
+      };
+
+      await octokit.checks.create({
+        ...checkParams,
+        status: "in_progress",
+      });
+
+      let error;
+
+      try {
+        await octokit.pulls.updateBranch({
+          ...repo,
+          pull_number: pullRequest.number,
+        });
+      } catch (e) {
+        error = e;
+      }
+
+      const completionParams = {
+        status: "completed",
+        conclusion: error ? "failure" : "success",
+        output: error
+          ? {
+              title: "Error",
+              summary: error.message,
+            }
+          : undefined,
+      };
+
+      await octokit.checks.create({
+        ...checkParams,
+        ...completionParams,
       });
     })
     .filter((promise) => promise);

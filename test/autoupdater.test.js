@@ -14,6 +14,9 @@ async function expectError(callback, expected) {
 
 function createOctokitMock({ prs = [] }) {
   return {
+    checks: {
+      create: jest.fn(),
+    },
     pulls: {
       updateBranch: jest.fn(),
       list: jest
@@ -61,18 +64,26 @@ describe("autoupdater", () => {
     const prs = [
       {
         labels: [{ name: "autoupdate" }],
+        head: { ref: "head-ref0" },
+        base: { ref: "base-ref0" },
         number: 0,
       },
       {
         labels: [],
+        head: { ref: "head-ref1" },
+        base: { ref: "base-ref1" },
         number: 1,
       },
       {
         labels: [{ name: "autoupdate" }, { name: "other" }],
+        head: { ref: "head-ref2" },
+        base: { ref: "base-ref2" },
         number: 2,
       },
       {
         labels: [{ name: "other" }],
+        head: { ref: "head-ref3" },
+        base: { ref: "base-ref3" },
         number: 3,
       },
     ];
