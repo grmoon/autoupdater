@@ -3,3 +3,5 @@ description: "Keep a PR head branch up-to-date"
 runs:
   using: "node12"
   main: "dist/index.js"
+branding:
+  icon: chevron-up
