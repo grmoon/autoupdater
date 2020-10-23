@@ -5785,14 +5785,33 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 351:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+/***/ 280:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const core = __webpack_require__(186);
 const github = __webpack_require__(438);
 
+module.exports = function autoupdater({ GITHUB_TOKEN } = {}) {
+  if (!GITHUB_TOKEN) {
+    throw new Error("GITHUB_TOKEN must be set.");
+  }
+
+  const octokit = github.getOctokit(GITHUB_TOKEN);
+  console.log(octokit);
+};
+
+
+/***/ }),
+
+/***/ 351:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+
+const autoupdater = __webpack_require__(280);
+
 try {
-  core.setOutput("Test");
+  autoupdater({
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+  });
 } catch (error) {
   core.setFailed(error.message);
 }

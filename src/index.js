@@ -1,8 +1,9 @@
-const core = require("@actions/core");
-const github = require("@actions/github");
+const autoupdater = require("./autoupdater");
 
 try {
-  core.setOutput("Test");
+  autoupdater({
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+  });
 } catch (error) {
   core.setFailed(error.message);
 }
