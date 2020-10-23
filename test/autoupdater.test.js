@@ -117,16 +117,6 @@ describe("autoupdater", () => {
     });
   });
 
-  it("should throw an error if it doesn't recognize an event", async () => {
-    const context = { eventName: "abc" };
-    const githubMock = createGithubMock({ context });
-
-    return expectError(
-      () => autoupdater(githubMock, { GITHUB_TOKEN: "GITHUB_TOKEN" }),
-      new Error("Unhandled event: abc")
-    );
-  });
-
   it("should update commit statuses to reflect errors updating", async () => {
     const repo = { repo: "repo", owner: "owner" };
     const context = { repo, ref: "ref", eventName: "push" };
