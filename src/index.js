@@ -1,10 +1,13 @@
-const core = require("@actions/core");
 const autoupdater = require("./autoupdater");
+const core = require("@actions/core");
+const github = require("./github");
 
-try {
-  autoupdater({
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-  });
-} catch (error) {
-  core.setFailed(error.message);
-}
+(async () => {
+  try {
+    await autoupdater(github, {
+      GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    });
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+})();
