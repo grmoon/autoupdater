@@ -5,9 +5,18 @@ const github = {
   },
   getOctokit: jest.fn().mockReturnValue({
     pulls: {
-      get: jest
-        .fn()
-        .mockReturnValue(new Promise((resolve, reject) => resolve())),
+      updateBranch: jest.fn(),
+      list: jest.fn().mockReturnValue(
+        new Promise((resolve, reject) =>
+          resolve({
+            data: [
+              {
+                labels: [jest.mock()],
+              },
+            ],
+          })
+        )
+      ),
     },
   }),
 };
