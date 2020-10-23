@@ -12,21 +12,23 @@ module.exports = async function autoupdater(_github, { GITHUB_TOKEN } = {}) {
 
   const promises = pullRequests
     .map((pullRequest) => {
-      console.log(pullRequest);
-      console.log(pullRequest.labels);
-      if (!pullRequest.labels.includes("autoupdate")) {
+      const shouldUpdate = pullRequest.labels.find(
+        (label) => label.name === "autoupdate"
+      );
+
+      if (!shouldUpdate) {
         // continue
         return false;
       }
 
-      // octokit.pulls.updateBranch({
-      //   ...repo,
-      //   pull_number: pullRequest.number,
-      // });
+      octokit.pulls.updateBranch({
+        ...repo,
+        pull_number: pullRequest.number,
+      });
     })
     .filter((promise) => promise);
 
-  // const output = await Promise.all(promises);
+  const output = await Promise.all(promises);
 
-  // console.log(output);
+  console.log(output);
 };
