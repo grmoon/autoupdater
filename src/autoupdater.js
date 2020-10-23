@@ -19,14 +19,15 @@ async function handlePushEvent({ repo, base, octokit }) {
 
       const checkParams = {
         ...repo,
-        head_sha: pullRequest.head.ref,
-        name: `autoupdate from ${pullRequest.base.ref}`,
+        sha: pullRequest.head.ref,
+        context: `autoupdate from ${pullRequest.base.ref}`,
       };
 
       console.log(6);
-      await octokit.checks.create({
+      await octokit.repos.createCommitStatus({
         ...checkParams,
-        status: "in_progress",
+        state: "pending",
+        description: "Updating",
       });
       console.log(7);
 
@@ -43,21 +44,11 @@ async function handlePushEvent({ repo, base, octokit }) {
         error = e;
       }
 
-      const completionParams = {
-        status: "completed",
-        conclusion: error ? "failure" : "success",
-        output: error
-          ? {
-              title: "Error",
-              summary: error.message,
-            }
-          : undefined,
-      };
-
       console.log(10);
-      await octokit.checks.create({
+      await octokit.repos.createCommitStatus({
         ...checkParams,
-        ...completionParams,
+        state: error ? "error" : "success",
+        description: error ? error.message : "Successfully updated",
       });
     })
     .filter((promise) => promise);
