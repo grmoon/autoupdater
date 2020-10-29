@@ -1,5 +1,7 @@
 const autoupdater = require("../src/autoupdater");
 
+jest.mock("@actions/core");
+
 async function expectError(callback, expected) {
   let error;
 
