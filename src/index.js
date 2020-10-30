@@ -8,6 +8,6 @@ const github = require("@actions/github");
       GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     });
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error);
   }
 })();
