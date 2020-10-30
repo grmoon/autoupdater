@@ -41,10 +41,12 @@ async function fetchPullRequests(octokit, repo, base) {
   const response = await octokit.pulls.list({ ...repo, base, state: "open" });
   const prs = response.data;
 
-  if (prs.length == 0) {
+  if (prs) {
     core.info(`No PRs have ${base} as their base branch.`);
   } else {
-    core.info(`The following PRs have ${base} as their base branch:`, prs);
+    core.info(
+      `The following PRs have ${base} as their base branch: ${prs.join(", ")}`
+    );
   }
 
   core.endGroup();
@@ -64,7 +66,7 @@ function filterPullRequests(pullRequests, base) {
       `No PRs with ${base} as their base branch have the "autoupdate" label.`
     );
   } else {
-    core.info(`The following PRs will be updated:`, prsToUpdate);
+    core.info(`The following PRs will be updated: ${prsToUpdate.join(", ")}`);
   }
 
   core.endGroup();
@@ -91,7 +93,7 @@ module.exports = async function autoupdater(github, { GITHUB_TOKEN } = {}) {
   const { repo, ref: base } = github.context;
 
   const pullRequests = await fetchPullRequests(octokit, repo, base);
-  const prsToUpdate = filterPullRequests(pullRequests);
+  const prsToUpdate = filterPullRequests(pullRequests, base);
 
   return updatePullRequests(prsToUpdate, repo, octokit);
 };
