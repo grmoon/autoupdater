@@ -1,5 +1,55 @@
 const core = require("@actions/core");
 
+async function getStatusChecks(pr, repo, octokit) {
+  core.info(`Getting require status checks for ${pr.head.ref}`);
+
+  const response = await octokit.repos.getStatusChecksProtection({
+    ...repo,
+    branch: pr.head.ref,
+  });
+  const statusChecks = response.data;
+
+  core.info(
+    `Required Status checks for ${pr.head.ref}: ${statusChecks.contexts.join(
+      ", "
+    )}`
+  );
+
+  return statusChecks;
+}
+
+async function waitForStatusChecks(pr, repo, octokit) {
+  const requiredChecks = getStatusChecks(pr, repo, octokit);
+
+  let completed;
+  let requiredCheckRuns;
+  let count = 0;
+
+  do {
+    if (count > 0) {
+      core.info("Waiting for checks to pass...");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+
+    const response = await octokit.checks.listForRef({
+      ...repo,
+      ref: pr.head.ref,
+    });
+
+    const checks = response.data;
+
+    requiredCheckRuns = checks.check_runs.filter((run) =>
+      requiredChecks.contexts.includes(run.name)
+    );
+
+    completed = requiredCheckRuns.every(
+      (run) => run.status == "completed" && run.conclusion == "success"
+    );
+
+    count++;
+  } while (!completed);
+}
+
 async function performUpdate({ pullRequest, repo, octokit }) {
   core.startGroup(`Updating PR: Updating ${pullRequest.head.ref}`);
 
@@ -9,13 +59,19 @@ async function performUpdate({ pullRequest, repo, octokit }) {
     context: `autoupdate from ${pullRequest.base.ref}`,
   };
 
-  core.debug("Sending pending status");
-
   await octokit.repos.createCommitStatus({
     ...commitStatusParams,
     state: "pending",
     description: "Updating",
   });
+
+  const timeout = setTimeout(() => {
+    throw Error("Timed out waiting for status checks.");
+  }, 30000);
+
+  await waitForStatusChecks(pullRequest, repo, octokit);
+
+  clearTimeout(timeout);
 
   let error;
 
