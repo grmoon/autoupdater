@@ -102,7 +102,7 @@ async function fetchPullRequests(octokit, repo, base) {
   const response = await octokit.pulls.list({ ...repo, base, state: "open" });
   const prs = response.data;
 
-  if (prs) {
+  if (!prs) {
     core.info(`No PRs have ${base} as their base branch.`);
   } else {
     core.info(
