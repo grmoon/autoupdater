@@ -69,7 +69,7 @@ async function performUpdate({ pullRequest, repo, octokit }) {
     throw Error("Timed out waiting for status checks.");
   }, 30000);
 
-  await waitForStatusChecks(pullRequest, repo, octokit);
+  // await waitForStatusChecks(pullRequest, repo, octokit);
 
   clearTimeout(timeout);
 
