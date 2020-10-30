@@ -15,8 +15,27 @@ async function expectError(callback, expected) {
 }
 
 function createOctokitMock({ prs = [], repos, pulls }) {
+  const checksMock = {
+    listForRef: jest.fn().mockReturnValue(
+      new Promise((resolve) =>
+        resolve({
+          data: {
+            check_runs: [],
+          },
+        })
+      )
+    ),
+  };
+
   const reposMock = {
     createCommitStatus: jest.fn(),
+    getStatusChecksProtection: jest.fn().mockReturnValue(
+      new Promise((resolve) =>
+        resolve({
+          data: { contexts: [] },
+        })
+      )
+    ),
     ...repos,
   };
 
@@ -31,6 +50,7 @@ function createOctokitMock({ prs = [], repos, pulls }) {
   return {
     repos: reposMock,
     pulls: pullsMock,
+    checks: checksMock,
   };
 }
 
@@ -174,7 +194,8 @@ describe("autoupdater", () => {
     expect(octokitMock.repos.createCommitStatus).toHaveBeenCalledWith({
       ...repo,
       context: "autoupdate from base-ref",
-      description: "My Error",
+      description:
+        "There was an error. Check the action output for more information.",
       sha: "head-sha0",
       state: "error",
     });
