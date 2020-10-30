@@ -174,7 +174,8 @@ describe("autoupdater", () => {
     expect(octokitMock.repos.createCommitStatus).toHaveBeenCalledWith({
       ...repo,
       context: "autoupdate from base-ref",
-      description: "My Error",
+      description:
+        "There was an error. Check the action output for more information.",
       sha: "head-sha0",
       state: "error",
     });

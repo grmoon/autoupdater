@@ -9,6 +9,8 @@ async function performUpdate({ pullRequest, repo, octokit }) {
     context: `autoupdate from ${pullRequest.base.ref}`,
   };
 
+  core.debug("Sending pending status");
+
   await octokit.repos.createCommitStatus({
     ...commitStatusParams,
     state: "pending",
@@ -24,12 +26,15 @@ async function performUpdate({ pullRequest, repo, octokit }) {
     });
   } catch (e) {
     error = e;
+    core.error(e.message);
   }
 
   await octokit.repos.createCommitStatus({
     ...commitStatusParams,
     state: error ? "error" : "success",
-    description: error ? error.message : "Successfully updated",
+    description: error
+      ? "There was an error. Check the action output for more information."
+      : "Successfully updated",
   });
 
   core.endGroup();
@@ -45,7 +50,9 @@ async function fetchPullRequests(octokit, repo, base) {
     core.info(`No PRs have ${base} as their base branch.`);
   } else {
     core.info(
-      `The following PRs have ${base} as their base branch: ${prs.join(", ")}`
+      `The following PRs have ${base} as their base branch: ${prs
+        .map((pr) => pr.number)
+        .join(", ")}`
     );
   }
 
@@ -66,7 +73,11 @@ function filterPullRequests(pullRequests, base) {
       `No PRs with ${base} as their base branch have the "autoupdate" label.`
     );
   } else {
-    core.info(`The following PRs will be updated: ${prsToUpdate.join(", ")}`);
+    core.info(
+      `The following PRs will be updated: ${prsToUpdate
+        .map((pr) => pr.number)
+        .join(", ")}`
+    );
   }
 
   core.endGroup();
